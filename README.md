@@ -4,7 +4,7 @@ Configuration multi-profil (`pro` / `perso`) gérée avec [Chezmoi](https://www.
 
 ## 1. Publier ce dépôt sur GitHub (première fois)
 
-1. Crée un dépôt **privé** vide nommé `dotfiles` sur GitHub (`SagazanBaptiste/dotfiles`).
+1. Crée un dépôt **privé** vide nommé `chez-moi` sur GitHub (`SagazanBaptiste/chez-moi`).
 2. Pousse le commit initial déjà préparé :
 
 ```sh
@@ -16,7 +16,7 @@ chezmoi git -- push -u origin main
 Après avoir généré une clé SSH dédiée à ce poste et l'avoir ajoutée à GitHub :
 
 ```sh
-sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply git@github.com:SagazanBaptiste/dotfiles.git
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply git@github.com:SagazanBaptiste/chez-moi.git
 ```
 
 Chezmoi te demandera interactivement :
