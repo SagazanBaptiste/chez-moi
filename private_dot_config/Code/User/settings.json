@@ -1,0 +1,38 @@
+{
+    "continue.enableTabAutocomplete": true,
+    "terminal.integrated.persistentSessionScrollback": 10000,
+    "terminal.integrated.shellIntegration.history": 1000,
+    "terminal.integrated.scrollback": 100,
+    "markdown.extension.completion.enabled": true,
+    "git.autofetch": true,
+    "python.defaultInterpreterPath": "/bin/python3",
+    "python.testing.pytestEnabled": true,
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.inlayHints.functionReturnTypes": true,
+    "python.analysis.inlayHints.callArgumentNames": "partial",
+    "python.analysis.typeCheckingMode": "standard",
+    "editor.formatOnSave": true,
+    "files.autoSave": "afterDelay",
+    "workbench.iconTheme": "catppuccin-macchiato",
+    "claudeCode.preferredLocation": "panel",
+    "editor.fontSize": 13,
+    "chat.agent.enabled": false,
+    "workbench.colorTheme": "Catppuccin Macchiato",
+    "github.copilot.enable": {
+        "*": false,
+        "plaintext": false,
+        "markdown": false,
+        "scminput": false,
+        "yaml": false
+    },
+    "editor.fontFamily": "JetBrainsMono Nerd Font",
+    "terminal.integrated.fontFamily": "JetBrainsMono Nerd Font Mono",
+    "catppuccin.customUIColors": {},
+    "workbench.editorAssociations": {
+        "*.copilotmd": "vscode.markdown.preview.editor",
+        "*.html": "default"
+    },
+    "workbench.secondarySideBar.defaultVisibility": "hidden",
+    "diffEditor.renderSideBySide": false,
+    "diffEditor.useInlineViewWhenSpaceIsLimited": true
+}

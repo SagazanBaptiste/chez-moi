@@ -1,0 +1,52 @@
+# User-installed commands. The zsh path array keeps entries unique.
+typeset -U path PATH
+path=(
+  "$HOME/.local/bin"
+  /usr/local/go/bin
+  "$HOME/go/bin"
+  $path
+)
+export PATH
+
+# Mise manages modern CLIs and language runtimes.
+(( $+commands[mise] )) && eval "$(mise activate zsh)"
+
+# Oh My Zsh owns completion initialization.
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME=""
+plugins=(git docker kubectl)
+[[ -r "$ZSH/oh-my-zsh.sh" ]] && source "$ZSH/oh-my-zsh.sh"
+
+# Use NVM's standard initialization so child processes inherit the selected Node.
+export NVM_DIR="$HOME/.config/nvm"
+[[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+
+_open_url() {
+  if (( $+commands[xdg-open] )); then
+    xdg-open "$1" >/dev/null 2>&1 &!
+  elif (( $+commands[open] )); then
+    open "$1"
+  fi
+}
+
+# Functions evaluate paths when invoked rather than when the shell starts.
+helmdocs() {
+  docker run --rm --volume "$PWD:/helm-docs" -u "$(id -u)" jnorwood/helm-docs:latest "$@"
+}
+
+alias excalidraw="echo 'Excalidraw starting on http://localhost:5000. Press Ctrl+C in this terminal to stop.' && _open_url http://localhost:5000 && docker run --rm -it --name excalidraw -p 5000:80 excalidraw/excalidraw:latest"
+alias dozzle='(sleep 2 && _open_url http://localhost:9999) & docker rm -f dozzle 2>/dev/null; docker run --name dozzle --rm -it -p 9999:8080 -v /var/run/docker.sock:/var/run/docker.sock amir20/dozzle:latest'
+{{- if eq .profile "perso" }}
+
+[[ -r "$HOME/.start_gluetun.sh" ]] && source "$HOME/.start_gluetun.sh"
+{{- end }}
+
+# Terraform completion (bash compatibility)
+if (( $+commands[terraform] )); then
+  autoload -U +X bashcompinit && bashcompinit
+  complete -o nospace -C "$(command -v terraform)" terraform
+fi
+
+(( $+commands[starship] )) && eval "$(starship init zsh)"
+[[ -r "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
+(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"

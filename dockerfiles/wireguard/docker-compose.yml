@@ -1,0 +1,33 @@
+services:
+  taupinette:
+    image: qmcgaw/gluetun
+    container_name: taupinette
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      # --- Config VPN ---
+      - VPN_SERVICE_PROVIDER=mullvad
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY:?Set WIREGUARD_PRIVATE_KEY in .env}
+      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES:?Set WIREGUARD_ADDRESSES in .env}
+      - SERVER_COUNTRIES=${SERVER_COUNTRIES:-France}
+
+      # --- Config Proxy Local ---
+      - HTTPPROXY=on
+      - SOCKS5=on
+      - SOCKS5_SERVER=on
+    ports:
+      - 127.0.0.1:8888:8888/tcp # Proxy HTTP
+      - 127.0.0.1:1080:1080/tcp # Proxy SOCKS5
+    restart: unless-stopped
+  proxy-socks5:
+    image: serjs/go-socks5-proxy
+    container_name: proxy-socks5
+    network_mode: "service:taupinette"
+    environment:
+      - REQUIRE_AUTH=false
+    depends_on:
+      - taupinette
+    restart: unless-stopped

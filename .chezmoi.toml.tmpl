@@ -1,0 +1,14 @@
+{{- $profile := promptChoiceOnce . "profile" "Machine profile" (list "pro" "perso") -}}
+{{- $gitName := promptStringOnce . "git_name" "Git user.name" "Baptiste SAGAZAN" -}}
+{{- $gitEmail := promptStringOnce . "git_email" "Git user.email" -}}
+{{- $gitSigningKey := promptStringOnce . "git_signingkey" "GPG signing key ID (optional, leave empty to disable)" "" -}}
+{{- $installPackages := promptBoolOnce . "install_packages" "Run automatic package & CLI install scripts" true -}}
+
+umask = 0o022
+
+[data]
+    profile = {{ $profile | quote }}
+    git_name = {{ $gitName | quote }}
+    git_email = {{ $gitEmail | quote }}
+    git_signingkey = {{ $gitSigningKey | quote }}
+    install_packages = {{ $installPackages }}

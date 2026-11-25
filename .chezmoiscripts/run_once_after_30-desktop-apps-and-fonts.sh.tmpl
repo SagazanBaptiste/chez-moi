@@ -1,0 +1,98 @@
+{{- if and .install_packages (eq .chezmoi.os "linux") -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+TMP_DIR="$(mktemp -d)"
+cleanup() {
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+FONT_DIR="$HOME/.local/share/fonts/JetBrainsMonoNerdFont"
+if [ ! -d "$FONT_DIR" ] || ! find "$FONT_DIR" -maxdepth 2 -type f -name '*.ttf' | grep -q .; then
+  echo "==> Installing JetBrainsMono Nerd Font..."
+  mkdir -p "$FONT_DIR"
+  if curl -fsSL "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip" -o "$TMP_DIR/JetBrainsMono.zip"; then
+    unzip -qo "$TMP_DIR/JetBrainsMono.zip" -d "$FONT_DIR"
+    fc-cache -fv "$HOME/.local/share/fonts" || true
+  else
+    echo "[WARN] Failed to download JetBrainsMono Nerd Font."
+  fi
+fi
+
+if command -v flatpak >/dev/null 2>&1; then
+  flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo \
+    || echo "[WARN] Could not configure Flathub remote."
+fi
+
+if command -v snap >/dev/null 2>&1; then
+  if ! command -v ghostty >/dev/null 2>&1 && ! snap list ghostty >/dev/null 2>&1; then
+    echo "==> Installing Ghostty..."
+    sudo snap install ghostty --classic || echo "[WARN] Ghostty snap installation failed."
+  fi
+
+  if ! command -v code >/dev/null 2>&1 && ! snap list code >/dev/null 2>&1; then
+    echo "==> Installing VS Code..."
+    sudo snap install code --classic || echo "[WARN] VS Code snap installation failed."
+  fi
+else
+  echo "[WARN] snap not available; install Ghostty and VS Code manually."
+fi
+
+if ! command -v vlc >/dev/null 2>&1; then
+  echo "==> Installing VLC..."
+  sudo apt-get install -y vlc || echo "[WARN] VLC installation failed."
+fi
+
+if command -v flatpak >/dev/null 2>&1; then
+  if ! flatpak info com.obsproject.Studio >/dev/null 2>&1; then
+    echo "==> Installing OBS Studio (Flatpak)..."
+    flatpak install -y flathub com.obsproject.Studio || echo "[WARN] OBS Studio installation failed."
+  fi
+
+  if ! flatpak info com.bitwarden.desktop >/dev/null 2>&1; then
+    echo "==> Installing Bitwarden (Flatpak)..."
+    flatpak install -y flathub com.bitwarden.desktop || echo "[WARN] Bitwarden installation failed."
+  fi
+fi
+
+if ! command -v google-chrome >/dev/null 2>&1; then
+  echo "==> Installing Google Chrome..."
+  if curl -fsSL "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -o "$TMP_DIR/google-chrome.deb"; then
+    sudo apt-get install -y "$TMP_DIR/google-chrome.deb" || echo "[WARN] Google Chrome installation failed."
+  else
+    echo "[WARN] Failed to download Google Chrome .deb."
+  fi
+fi
+
+if ! command -v firefox >/dev/null 2>&1; then
+  echo "[INFO] Firefox not detected; install it via snap or apt if needed."
+fi
+
+if command -v code >/dev/null 2>&1; then
+  echo "==> Installing VS Code extensions..."
+  VSCODE_EXTENSIONS=(
+    catppuccin.catppuccin-vsc
+    catppuccin.catppuccin-vsc-icons
+    charliermarsh.ruff
+    ms-python.python
+    ms-python.vscode-pylance
+    ms-python.debugpy
+    ms-python.vscode-python-envs
+    ms-azuretools.vscode-docker
+    ms-azuretools.vscode-containers
+    ms-vscode.sublime-keybindings
+    tamasfe.even-better-toml
+    yzhang.markdown-all-in-one
+  )
+  for ext in "${VSCODE_EXTENSIONS[@]}"; do
+    code --install-extension "$ext" || echo "[WARN] Could not install VS Code extension: $ext"
+  done
+else
+  echo "[WARN] code CLI not in PATH; skipping VS Code extension installation."
+fi
+
+echo "[INFO] Desktop apps requiring manual vendor install/repo if desired:"
+echo "  - Claude Desktop (Linux deb/apt): https://claude.ai/download"
+echo "  - Antigravity Desktop / IDE: official vendor release page"
+{{ end -}}

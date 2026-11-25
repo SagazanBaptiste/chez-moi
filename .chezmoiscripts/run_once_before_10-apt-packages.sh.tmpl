@@ -1,0 +1,65 @@
+{{- if and .install_packages (eq .chezmoi.os "linux") -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+export DEBIAN_FRONTEND=noninteractive
+
+APT_PACKAGES=(
+  git
+  git-lfs
+  zsh
+  curl
+  wget
+  jq
+  unzip
+  fontconfig
+  ca-certificates
+  gnupg
+  build-essential
+  cmake
+  ripgrep
+  bat
+  tmux
+  tree
+  xclip
+  vim
+  p7zip-full
+  libfuse2t64
+  flatpak
+  python3-dev
+  libssl-dev
+  libffi-dev
+  libpq-dev
+  libsqlite3-dev
+  zlib1g-dev
+  libbz2-dev
+  libreadline-dev
+  liblzma-dev
+  libncurses-dev
+  docker.io
+  docker-buildx-plugin
+  docker-compose-plugin
+)
+
+echo "==> Installing base apt packages..."
+sudo apt-get update
+sudo apt-get install -y "${APT_PACKAGES[@]}"
+
+if getent group docker >/dev/null 2>&1 && ! id -nG "$USER" | grep -qw docker; then
+  echo "==> Adding $USER to docker group..."
+  sudo usermod -aG docker "$USER" || echo "[WARN] Failed to add $USER to docker group."
+fi
+
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+  echo "==> Installing Oh My Zsh..."
+  RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
+    || echo "[WARN] Oh My Zsh installation failed."
+fi
+
+zsh_path="$(command -v zsh || true)"
+if [ -n "$zsh_path" ] && [ "${SHELL:-}" != "$zsh_path" ]; then
+  echo "==> Setting default shell to $zsh_path..."
+  chsh -s "$zsh_path" || echo "[WARN] Could not change default shell automatically; run: chsh -s $zsh_path"
+fi
+{{ end -}}

@@ -1,0 +1,37 @@
+// Place your key bindings in this file to override the defaults
+[
+    {
+        "key": "alt+d",
+        "command": "-gl.closeChat",
+        "when": "config.gitlab.duoChat.enabled && gitlab:chatAvailable && gitlab:chatAvailableForProject && gitlab:chatFocused && gitlab:isRemoteEnvironment && activeViewlet == 'workbench.view.extension.gitlab-duo' || config.gitlab.duoChat.enabled && gitlab:chatAvailable && gitlab:chatAvailableForProject && gitlab:chatFocused && !gitlab.featureFlags.languageServerWebviews && activeViewlet == 'workbench.view.extension.gitlab-duo'"
+    },
+    {
+        "key": "alt+d",
+        "command": "-gl.webview.closeChat",
+        "when": "config.gitlab.duoChat.enabled && gitlab.featureFlags.languageServerWebviews && gitlab:chatAvailable && gitlab:chatAvailableForProject && gitlab:chatFocused && !gitlab:isRemoteEnvironment && activeViewlet == 'workbench.view.extension.gitlab-duo'"
+    },
+    {
+        "key": "alt+d",
+        "command": "-gl.openChat",
+        "when": "config.gitlab.duoChat.enabled && gitlab:chatAvailable && gitlab:chatAvailableForProject && gitlab:isRemoteEnvironment && activeViewlet != 'workbench.view.extension.gitlab-duo' || config.gitlab.duoChat.enabled && gitlab:chatAvailable && gitlab:chatAvailableForProject && !gitlab.featureFlags.languageServerWebviews && activeViewlet != 'workbench.view.extension.gitlab-duo'"
+    },
+    {
+        "key": "alt+d",
+        "command": "-gl.webview.duoChatV2.show",
+        "when": "config.gitlab.duoChat.enabled && gitlab.featureFlags.languageServerWebviews && gitlab:chatAvailable && gitlab:chatAvailableForProject && !gitlab:isRemoteEnvironment && activeViewlet != 'workbench.view.extension.gitlab-duo'"
+    },
+    {
+        "key": "alt+d",
+        "command": "-gl.focusChat",
+        "when": "config.gitlab.duoChat.enabled && gitlab:chatAvailable && gitlab:chatAvailableForProject && gitlab:isRemoteEnvironment && !gitlab:chatFocused && activeViewlet == 'workbench.view.extension.gitlab-duo' || config.gitlab.duoChat.enabled && gitlab:chatAvailable && gitlab:chatAvailableForProject && !gitlab.featureFlags.languageServerWebviews && !gitlab:chatFocused && activeViewlet == 'workbench.view.extension.gitlab-duo'"
+    },
+    {
+        "key": "alt+d",
+        "command": "-gl.webview.focusChat",
+        "when": "config.gitlab.duoChat.enabled && gitlab.featureFlags.languageServerWebviews && gitlab:chatAvailable && gitlab:chatAvailableForProject && !gitlab:chatFocused && !gitlab:isRemoteEnvironment && activeViewlet == 'workbench.view.extension.gitlab-duo'"
+    },
+    {
+        "key": "ctrl+alt+d",
+        "command": "editor.debug.action.selectionToRepl"
+    }
+]

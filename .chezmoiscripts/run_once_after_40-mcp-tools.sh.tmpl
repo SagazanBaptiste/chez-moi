@@ -1,0 +1,24 @@
+{{- if and .install_packages (eq .chezmoi.os "linux") -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+TOOLS_DIR="$HOME/tools"
+TOOLS_REPO="git@github.com:SagazanBaptiste/mcp-tools.git"
+
+if [ -d "$TOOLS_DIR" ]; then
+  echo "==> $TOOLS_DIR already exists; skipping clone."
+  exit 0
+fi
+
+if GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=5" git ls-remote "$TOOLS_REPO" >/dev/null 2>&1; then
+  echo "==> Cloning mcp-tools into $TOOLS_DIR..."
+  git clone "$TOOLS_REPO" "$TOOLS_DIR"
+  echo "[INFO] mcp-tools cloned. Next steps:"
+  echo "  1. Configure ~/.config/tools-daemon/config.yml (secrets stay out of Git)."
+  echo "  2. Symlink desired skills from ~/tools/skills/ to ~/.gemini/config/skills/ or ~/.claude/skills/."
+else
+  echo "[INFO] SSH access to $TOOLS_REPO not configured yet; skipping clone."
+  echo "       Once your new SSH key is added to GitHub, run:"
+  echo "       git clone $TOOLS_REPO $TOOLS_DIR"
+fi
+{{ end -}}

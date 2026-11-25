@@ -1,0 +1,273 @@
+<title>Test à l'aveugle</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : une question à la fois, de trois natures (choix par concept, compréhension, écriture libre) ; code coloré en grand. */
+:root {
+  --bg: #eff1f5; --card: #ffffff; --code: #e6e9ef; --fg: #4c4f69; --muted: #6c6f85; --line: #ccd0da;
+  --accent: #1e66f5; --key: #8839ef; --event: #179299; --op: #d20f39; --comment: #7c7f93; --str: #df8e1d;
+  --body: "Atkinson Hyperlegible", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #1e1e2e; --card: #24273a; --code: #181825; --fg: #cdd6f4; --muted: #a6adc8; --line: #45475a;
+  --accent: #89b4fa; --key: #cba6f7; --event: #94e2d5; --op: #f38ba8; --comment: #9399b2; --str: #f9e2af; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #1e1e2e; --card: #24273a; --code: #181825; --fg: #cdd6f4; --muted: #a6adc8; --line: #45475a;
+  --accent: #89b4fa; --key: #cba6f7; --event: #94e2d5; --op: #f38ba8; --comment: #9399b2; --str: #f9e2af; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 17px; line-height: 1.5; }
+.wrap { max-width: 1400px; margin: 0 auto; padding-block: 24px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 18px; }
+.top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; }
+.top h1 { font-size: 26px; margin: 0; text-wrap: balance; flex: 1 1 400px; }
+.kind { font-size: 13px; font-weight: 700; letter-spacing: .05em; color: var(--accent); }
+.step { font-family: var(--mono); font-size: 15px; color: var(--muted); }
+.bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); transition: width .2s; }
+.sub { color: var(--muted); margin: 0; max-width: 85ch; }
+.opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.opts.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 1000px) { .opts, .opts.two { grid-template-columns: minmax(0, 1fr); } }
+.opt { all: unset; box-sizing: border-box; cursor: pointer; background: var(--card); border: 2px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.opt:hover { border-color: var(--muted); }
+.opt:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.opt.sel { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.opt .h { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 18px; }
+.opt .k { font-family: var(--mono); font-size: 13px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; }
+.opt .n { font-size: 15px; color: var(--muted); }
+pre { margin: 0; background: var(--code); border-radius: 6px; padding: 14px; overflow-x: auto; font-family: var(--mono); font-size: 14.5px; line-height: 1.6; white-space: pre; }
+.c { color: var(--comment); font-style: italic; } .ky { color: var(--key); font-weight: 600; } .ev { color: var(--event); } .op { color: var(--op); font-weight: 600; } .fl { color: var(--str); }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+button.b { font: inherit; font-size: 16px; padding: 8px 16px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--fg); cursor: pointer; }
+button.b:focus-visible { outline: 3px solid var(--accent); }
+button.b.pri { background: var(--accent); color: var(--card); border-color: var(--accent); font-weight: 700; }
+button.b.on { border: 2px solid var(--accent); }
+textarea { font: inherit; font-size: 16px; width: 100%; box-sizing: border-box; padding: 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--fg); }
+textarea.code { font-family: var(--mono); font-size: 14.5px; line-height: 1.6; background: var(--code); }
+.err { color: var(--op); font-size: 15px; }
+.result { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 10px; }
+.result pre { white-space: pre-wrap; }
+.ctx { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div style="flex:1 1 400px; display:grid; gap:4px">
+      <span class="kind" id="kind"></span>
+      <h1 id="q" style="margin:0"></h1>
+    </div>
+    <span class="step" id="step"></span>
+  </div>
+  <div class="bar"><i id="bar"></i></div>
+  <p class="sub" id="qs"></p>
+  <div class="ctx" id="ctx"></div>
+  <div id="body"></div>
+  <div class="row" id="noneRow">
+    <button class="b" id="none">Aucune ne me va</button>
+  </div>
+  <label for="com" class="sub" id="comLabel">Commentaire</label>
+  <textarea id="com" rows="3"></textarea>
+  <div class="row">
+    <button class="b" id="prev">Précédent</button>
+    <button class="b pri" id="next">Suivant</button>
+    <span class="err" id="err"></span>
+  </div>
+  <div class="result" id="result" hidden>
+    <b>Tes réponses : copie-les et colle-les dans la conversation.</b>
+    <pre id="out"></pre>
+    <div class="row"><button class="b pri" id="copy">Copier</button><span class="sub" id="copied"></span></div>
+  </div>
+</div>
+
+<script>
+const Q = [
+{ kind: "CHOIX · OÙ EST L'ID", t: "Où un événement dit-il quel est son id ?",
+  s: "Même entité challenge, deux de ses événements. Le bundle a un événement dont l'id n'est pas dans le payload.",
+  opts: [
+   ["entité", "L'id se déclare une fois pour toute l'entité.",
+`# entities/challenge.yml
+id: data.challengeId
+events:
+  kyc.challenge.created: {follows: kyc.session.created}
+  kyc.challenge.failed:  {follows: kyc.challenge.started}`],
+   ["événement", "Chaque événement dit lui-même où est son id.",
+`kyc.challenge.created:
+  id: data.challengeId
+  follows: kyc.session.created
+kyc.challenge.failed:
+  id: data.challengeId
+  follows: kyc.challenge.started`],
+   ["entité + exception", "Défaut sur l'entité, un événement le redit seulement s'il diffère.",
+`# entities/bundle.yml
+id: data.bundleId
+events:
+  esig.bundle.created: {follows: caseflow.case.initialized}
+  esig.bundle.contract-signed:
+    id: meta.subject          # id hors payload
+    follows: esig.bundle.created`]],
+  perm: [1, 2, 0] },
+{ kind: "CHOIX · VERS QUOI POINTE UNE RÉFÉRENCE", t: "Un champ porte l'id d'autre chose : on écrit quoi ?",
+  s: "challenge.created porte sessionId ; mo.case.created porte l'id du dossier en texte dans caseflowCaseId.",
+  opts: [
+   ["vers une entité", "Le champ vise une entité.",
+`kyc.challenge.created:
+  refs: {data.sessionId: session}
+mo.case.created:
+  refs: {data.caseflowCaseId: case}`],
+   ["vers un événement", "Le champ contient l'id de cet événement-là.",
+`kyc.challenge.created:
+  refs: {data.sessionId: kyc.session.created}
+mo.case.created:
+  refs: {data.caseflowCaseId: caseflow.case.created}`],
+   ["déduit + exception", "Rien à écrire si le nom du champ suffit ; on écrit seulement l'exception.",
+`kyc.challenge.created: {}
+  # data.sessionId : déduit (le nom dit session)
+mo.case.created:
+  refs: {data.caseflowCaseId: case}`]],
+  perm: [2, 0, 1] },
+{ kind: "CHOIX · PLUSIEURS IDS", t: "otp.sent porte otpId, smsId et applicantId : lequel est le sien ?",
+  s: "Les deux autres sont alors des références.",
+  opts: [
+   ["déclaré", "L'événement le dit.",
+`crossdomain.otp.sent:
+  id: data.otpId
+  follows: crossdomain.sms.sent`],
+   ["convention de nom", "Le champ qui porte le nom de l'entité de l'événement (otp → otpId). Rien à écrire.",
+`crossdomain.otp.sent:
+  follows: crossdomain.sms.sent
+  # id : data.otpId, déduit du nom`],
+   ["appris de la capture", "La valeur qui apparaît pour la première fois dans cet événement. L'outil affiche sa déduction, tu la valides.",
+`crossdomain.otp.sent:
+  follows: crossdomain.sms.sent
+  # id : data.otpId (vu neuf dans 100 % des cas en dev)`]],
+  perm: [0, 2, 1] },
+{ kind: "COMPRÉHENSION", t: "Que se passe-t-il après un kyc.challenge.failed ?",
+  s: "Lis ce bloc sans contexte et dis ce que tu comprends.",
+  code:
+`kyc.challenge.created:
+  id: data.challengeId
+  follows: [kyc.session.created, kyc.challenge.failed]`,
+  read: [
+   "Le même challenge recommence (même id)",
+   "Un nouveau challenge naît pour la même session",
+   "Un nouveau challenge naît, sans lien avec la session",
+   "Je ne sais pas"] },
+{ kind: "À TOI D'ÉCRIRE", t: "Écris l'ajout de otp.sent comme tu aimerais l'écrire",
+  s: "crossdomain.otp.sent : son id est data.otpId, il porte data.smsId, il arrive après crossdomain.sms.sent. Écris librement, même hors de tout ce qu'on a vu.",
+  compose:
+`crossdomain.otp.sent:
+  ` }
+];
+const ans = Q.map(() => ({ c: null, t: "", w: "" }));
+let i = 0;
+try { const s = JSON.parse(localStorage.getItem("blind-test") || "null"); if (s && s.length === Q.length) s.forEach((a, k) => ans[k] = a); } catch (e) {}
+const save = () => { try { localStorage.setItem("blind-test", JSON.stringify(ans)); } catch (e) {} };
+const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function hl(code) {
+  return code.split("\n").map(line => {
+    const h = line.indexOf("#");
+    const body = h >= 0 ? line.slice(0, h) : line;
+    const com = h >= 0 ? `<span class="c">${esc(line.slice(h))}</span>` : "";
+    const tokens = body.split(/(\s+|[{}\[\],|*?()]|:(?=\s|$))/).filter(t => t);
+    let out = "";
+    tokens.forEach((t, idx) => {
+      const next = tokens.slice(idx + 1).find(x => !/^\s+$/.test(x));
+      if (/^\s+$/.test(t)) { out += t; return; }
+      if (/^[|*?()\[\]]$/.test(t)) { out += `<span class="op">${esc(t)}</span>`; return; }
+      if (/^[{},:]$/.test(t)) { out += esc(t); return; }
+      if (next === ":" && /^[a-z_]+$/.test(t)) { out += `<span class="ky">${esc(t)}</span>`; return; }
+      if (/^(data|meta)\./.test(t)) { out += `<span class="fl">${esc(t)}</span>`; return; }
+      if (/^[a-z-]+(\.[a-z0-9-]+){2,}$/.test(t)) { out += `<span class="ev">${esc(t)}</span>`; return; }
+      out += esc(t);
+    });
+    return out + com;
+  }).join("\n");
+}
+const $ = id => document.getElementById(id);
+function render() {
+  const q = Q[i];
+  $("kind").textContent = q.kind; $("q").textContent = q.t; $("qs").textContent = q.s;
+  $("step").textContent = `${i + 1} / ${Q.length}`;
+  $("bar").style.width = `${(i + 1) / Q.length * 100}%`;
+  $("ctx").innerHTML = q.code ? `<pre>${hl(q.code)}</pre>` : "";
+  const body = $("body"); body.innerHTML = "";
+  $("noneRow").hidden = !q.opts;
+  if (q.opts) {
+    const box = document.createElement("div"); box.className = "opts";
+    q.perm.forEach((g, k) => {
+      const [, note, code] = q.opts[g];
+      const b = document.createElement("button");
+      b.className = "opt" + (ans[i].c === k ? " sel" : "");
+      b.innerHTML = `<span class="h">Option ${k + 1}<span class="k">${k + 1}</span></span><span class="n"></span><pre>${hl(code)}</pre>`;
+      b.querySelector(".n").textContent = note;
+      b.addEventListener("click", () => pick(k));
+      box.appendChild(b);
+    });
+    body.appendChild(box);
+    $("none").classList.toggle("on", ans[i].c === -1);
+    $("comLabel").textContent = "Commentaire (optionnel, obligatoire si aucune ne te va)";
+  } else if (q.read) {
+    const box = document.createElement("div"); box.className = "opts two";
+    q.read.forEach((r, k) => {
+      const b = document.createElement("button");
+      b.className = "opt" + (ans[i].c === k ? " sel" : "");
+      b.innerHTML = `<span class="h" style="font-size:17px">${esc(r)}<span class="k">${k + 1}</span></span>`;
+      b.addEventListener("click", () => pick(k));
+      box.appendChild(b);
+    });
+    body.appendChild(box);
+    $("comLabel").textContent = "Qu'est-ce qui t'a fait hésiter ? (optionnel)";
+  } else {
+    const ta = document.createElement("textarea");
+    ta.className = "code"; ta.rows = 10; ta.id = "write";
+    ta.value = ans[i].w || q.compose;
+    ta.addEventListener("input", () => { ans[i].w = ta.value; save(); $("err").textContent = ""; });
+    body.appendChild(ta);
+    $("comLabel").textContent = "Pourquoi cette forme ? (optionnel)";
+  }
+  $("com").value = ans[i].t;
+  $("next").textContent = i === Q.length - 1 ? "Terminer" : "Suivant";
+  $("err").textContent = "";
+}
+function pick(k) { ans[i].c = k; save(); render(); }
+function valid() {
+  const q = Q[i], a = ans[i];
+  if (q.compose) return (a.w || "").trim() && (a.w || "").trim() !== q.compose.trim() ? "" : "Écris ta version avant de continuer.";
+  if (a.c === null) return q.opts ? "Choisis une option ou « Aucune ne me va »." : "Choisis une réponse.";
+  if (a.c === -1 && !a.t.trim()) return "Dis en quelques mots ce qui ne va pas.";
+  return "";
+}
+function go(d) {
+  if (d > 0) {
+    const e = valid(); if (e) { $("err").textContent = e; return; }
+    if (i === Q.length - 1) { finish(); return; }
+  }
+  i = Math.max(0, Math.min(Q.length - 1, i + d)); render(); window.scrollTo({ top: 0 });
+}
+function finish() {
+  const lines = Q.map((q, k) => {
+    const a = ans[k]; const com = a.t.trim() ? ` | commentaire : ${a.t.trim()}` : "";
+    if (q.opts) return `- ${q.t} : ${a.c === -1 ? "aucune" : `option ${a.c + 1} = ${q.opts[q.perm[a.c]][0]}`}${com}`;
+    if (q.read) return `- ${q.t} : ${q.read[a.c]}${com}`;
+    return `- ${q.t} :\n${a.w.trimEnd()}${com ? `\n  ${com.slice(3)}` : ""}`;
+  });
+  $("out").textContent = `Résultats de mon test à l'aveugle, tour 2 :\n${lines.join("\n")}`;
+  $("result").hidden = false; $("result").scrollIntoView({ behavior: "smooth" });
+}
+$("none").addEventListener("click", () => pick(-1));
+$("com").addEventListener("input", () => { ans[i].t = $("com").value; save(); $("err").textContent = ""; });
+$("prev").addEventListener("click", () => go(-1));
+$("next").addEventListener("click", () => go(1));
+$("copy").addEventListener("click", () => {
+  navigator.clipboard.writeText($("out").textContent).then(() => $("copied").textContent = "Copié.").catch(() => {
+    const r = document.createRange(); r.selectNodeContents($("out"));
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    $("copied").textContent = "Texte sélectionné : copie-le avec Ctrl+C.";
+  });
+});
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "TEXTAREA") return;
+  const q = Q[i]; const n = q.opts ? 3 : q.read ? q.read.length : 0;
+  const k = +e.key - 1; if (k >= 0 && k < n) pick(k);
+});
+render();
+</script>

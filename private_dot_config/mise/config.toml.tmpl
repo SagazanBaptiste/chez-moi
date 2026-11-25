@@ -1,0 +1,25 @@
+[tools]
+# Core runtimes & common CLIs
+node = "lts"
+go = "latest"
+uv = "latest"
+neovim = "latest"
+starship = "latest"
+zoxide = "latest"
+fzf = "latest"
+lazygit = "latest"
+delta = "latest"
+yq = "latest"
+duckdb = "latest"
+{{- if eq .profile "pro" }}
+
+# Pro / cloud / infra CLIs
+kubectl = "latest"
+k9s = "latest"
+helm = "latest"
+helmfile = "latest"
+kind = "latest"
+terraform = "latest"
+task = "latest"
+maven = "latest"
+{{- end }}

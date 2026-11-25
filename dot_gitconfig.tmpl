@@ -1,0 +1,26 @@
+[user]
+	name = {{ .git_name | quote }}
+	email = {{ .git_email }}
+{{- if .git_signingkey }}
+	signingkey = {{ .git_signingkey }}
+{{- end }}
+[core]
+	autocrlf = input
+	editor = nvim
+[color]
+	ui = auto
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+{{- if .git_signingkey }}
+[commit]
+	gpgsign = true
+{{- end }}
+[sequence]
+	editor = nvim
+[fetch]
+	prune = true
+[alias]
+	cleanup = "!git fetch --prune && git branch -vv | awk '/: gone]/{print $1}' | xargs -r git branch -D"

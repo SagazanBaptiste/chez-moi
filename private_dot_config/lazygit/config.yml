@@ -1,0 +1,38 @@
+git:
+  pagers:
+    - colorArg: always
+      pager: "delta --dark --paging=never --syntax-theme='Catppuccin Macchiato'"
+  diffContextSize: 5
+  localBranchSortOrder: recency
+gui:
+  nerdFontsVersion: "3"
+  filterMode: fuzzy
+  sidePanelWidth: 0.30
+  expandFocusedSidePanel: true
+  showNumstatInFilesView: true
+keybinding:
+  files:
+    toggleTreeView: t
+  main:
+    prevHunk: h
+    nextHunk: l
+  universal:
+    # Keep Vim navigation consistent across terminal tools.
+    prevItem: k
+    nextItem: j
+    prevBlock: h
+    nextBlock: l
+    scrollLeft: H
+    scrollRight: L
+
+    startSearch: <alt+f>
+    prevPage: <alt+k>
+    nextPage: <alt+j>
+    prevTab: <alt+left>
+    nextTab: <alt+right>
+    cyclePagers: <alt+p>
+    extrasMenu: <ctrl+x>
+    decreaseContextInDiffView: <alt+down>
+    increaseContextInDiffView: <alt+up>
+os:
+  editPreset: nvim-remote

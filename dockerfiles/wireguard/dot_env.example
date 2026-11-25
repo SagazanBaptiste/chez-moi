@@ -1,0 +1,4 @@
+# Copy to .env (never commit) and fill from Bitwarden
+WIREGUARD_PRIVATE_KEY=
+WIREGUARD_ADDRESSES=
+SERVER_COUNTRIES=France

@@ -1,0 +1,138 @@
+# ~/.config/starship.toml
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = false
+palette = "catppuccin_mocha"
+
+# ==========================================
+# PALETTE CATPPUCCIN MOCHA
+# ==========================================
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+mauve = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
+text = "#cdd6f4"
+subtext1 = "#bac2de"
+subtext0 = "#a6adc8"
+overlay2 = "#9399b2"
+overlay1 = "#7f849c"
+overlay0 = "#6c7086"
+surface2 = "#585b70"
+surface1 = "#45475a"
+surface0 = "#313244"
+base = "#1e1e2e"
+mantle = "#181825"
+crust = "#11111b"
+
+# ==========================================
+# LAYOUT (Status line + prompt épuré)
+# ==========================================
+# Ligne 1 : contexte de travail et runtimes.
+# Ligne 2 : uniquement le prompt de saisie.
+format = """
+$directory\
+$git_branch\
+$git_status\
+$fill\
+$python\
+$nodejs\
+$package\
+$docker_context\
+$kubernetes\
+$cmd_duration\
+$line_break\
+$character"""
+
+# ==========================================
+# MODULES GAUCHE
+# ==========================================
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[NORMAL ❮](bold yellow)"
+
+[fill]
+symbol = " "
+
+[directory]
+style = "bold blue"
+read_only = " 󰌾"
+truncation_length = 3
+truncate_to_repo = true
+# Format pur, pas de mots
+format = "[$path]($style)[$read_only]($read_only_style) "
+
+[git_branch]
+symbol = " "
+style = "bold pink"
+format = "[$symbol$branch]($style) "
+
+[git_status]
+format = "($all_status$ahead_behind) "
+conflicted = "[=$count](bold red) "
+up_to_date = ""
+staged = "[+$count](bold green) "
+modified = "[!$count](bold yellow) "
+deleted = "[-$count](bold red) "
+renamed = "[»$count](bold peach) "
+untracked = "[?$count](bold blue) "
+stashed = ""
+ahead = "[⇡$count](bold green) "
+behind = "[⇣$count](bold yellow) "
+diverged = "[⇕⇡$ahead_count⇣$behind_count](bold red) "
+
+# ==========================================
+# MODULES DROITE (La "Status Line")
+# ==========================================
+# Le format retire les mots comme "via" et ne laisse que l'icône + version + (env)
+[python]
+symbol = " "
+style = "yellow"
+format = '[$symbol$version( \($virtualenv\)) ]($style)'
+
+[nodejs]
+symbol = " "
+style = "green"
+format = '[$symbol($version )]($style)'
+
+[package]
+symbol = "󰏗 "
+style = "lavender"
+format = '[$symbol$version ]($style)'
+
+[docker_context]
+symbol = " "
+style = "blue"
+format = '[$symbol$context]($style)'
+
+[kubernetes]
+disabled = false
+symbol = "󱃾 "
+style = "teal"
+format = '[$symbol$context]($style)'
+detect_files = [
+    "Chart.yaml",
+    "kustomization.yaml",
+    "kustomization.yml",
+    "skaffold.yaml",
+    "skaffold.yml",
+    "tiltfile",
+    "Tiltfile",
+]
+detect_folders = ["k8s", "kube", "kubernetes", "charts"]
+
+[cmd_duration]
+min_time = 2_000               # S'affiche uniquement si la commande prend plus de 2s
+format = "[$duration]($style)"
+style = "peach"

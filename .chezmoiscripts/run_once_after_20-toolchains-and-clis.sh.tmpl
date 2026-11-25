@@ -1,0 +1,70 @@
+{{- if and .install_packages (eq .chezmoi.os "linux") -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p "$HOME/.local/bin"
+export PATH="$HOME/.local/bin:$PATH"
+
+if ! command -v rustup >/dev/null 2>&1; then
+  echo "==> Installing Rust via rustup..."
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path \
+    || echo "[WARN] rustup installation failed."
+fi
+[ -r "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
+if ! command -v mise >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/mise" ]; then
+  echo "==> Installing mise..."
+  curl -fsSL https://mise.run | sh
+fi
+
+MISE_BIN="$(command -v mise || echo "$HOME/.local/bin/mise")"
+echo "==> Installing runtimes and CLIs via mise..."
+"$MISE_BIN" install --yes
+eval "$("$MISE_BIN" activate bash)"
+
+if command -v uv >/dev/null 2>&1; then
+  echo "==> Installing Python CLI tools via uv..."
+  for pkg in basedpyright debugpy ty; do
+    uv tool install "$pkg" || echo "[WARN] Failed uv tool install $pkg"
+  done
+else
+  echo "[WARN] uv not found in PATH; skipping uv tool installs."
+fi
+
+if ! command -v rtk >/dev/null 2>&1; then
+  echo "==> Installing rtk..."
+  curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh \
+    || echo "[WARN] rtk installation failed."
+fi
+{{- if eq .profile "pro" }}
+
+if ! command -v hl >/dev/null 2>&1; then
+  if command -v cargo >/dev/null 2>&1; then
+    echo "==> Installing hl via cargo (pro profile)..."
+    cargo install hl || echo "[WARN] Failed to install hl via cargo."
+  else
+    echo "[WARN] cargo not found; skipping hl installation."
+  fi
+fi
+
+if ! command -v mc >/dev/null 2>&1; then
+  echo "==> Installing MinIO Client (mc) (pro profile)..."
+  if curl -fsSL "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "$HOME/.local/bin/mc.tmp"; then
+    chmod +x "$HOME/.local/bin/mc.tmp"
+    mv "$HOME/.local/bin/mc.tmp" "$HOME/.local/bin/mc"
+  else
+    echo "[WARN] Failed to download MinIO Client (mc)."
+  fi
+fi
+{{- end }}
+
+if ! command -v claude >/dev/null 2>&1; then
+  echo "==> Installing Claude Code CLI..."
+  curl -fsSL https://claude.ai/install.sh | bash \
+    || echo "[WARN] Claude Code CLI installation failed."
+fi
+
+if ! command -v agy >/dev/null 2>&1; then
+  echo "[INFO] Antigravity CLI (agy) is not installed yet; install it via the official Antigravity installer."
+fi
+{{ end -}}
